@@ -1,0 +1,16 @@
+{
+  "rabbitmq": {
+    "user_name": "guest",
+    "password": "guest",
+    "port": ""
+  },
+  "mysql":
+  {
+    "host": "localhost",
+    "port": "3306",
+    "user": "root",
+    "password": "root",
+    "name": "novel",
+    "max_open_conn": 100
+  }
+}
