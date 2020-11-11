@@ -9,31 +9,28 @@ import (
 	"io/ioutil"
 	"time"
 )
-type Mysql struct {
-	Host        string `json:"host"`
-	Port        string `json:"port"`
-	User        string `json:"user"`
-	Password    string `json:"password"`
-	Name        string `json:"name"`
-	MaxOpenConn int    `json:"max_open_conn"`
-}
+
 type Config struct {
-	Task struct {
-		Getjob string `json:"getjob"`
-		DoTask string `json:"doTask"`
-		ChannelNum string `json:"channel_num"`
-	} `json:"task"`
 	Rabbitmq struct {
 		UserName string `json:"user_name"`
 		Password string `json:"password"`
 		Port     string `json:"port"`
 	} `json:"rabbitmq"`
-	Mysql Mysql `json:"robot"`
+	Mysql struct {
+		Host        string `json:"host"`
+		Port        string `json:"port"`
+		User        string `json:"user"`
+		Password    string `json:"password"`
+		Name        string `json:"name"`
+		MaxOpenConn int    `json:"max_open_conn"`
+	} `json:"mysql"`
 }
+
 var instanceDb *gorm.DB
 var DefaultConfig *Config
-func GetConfig()*Config{
-	if DefaultConfig==nil {
+
+func GetConfig() *Config {
+	if DefaultConfig == nil {
 		conf, err := ioutil.ReadFile("./conf/config.json")
 		if err != nil {
 			fmt.Println(err)
@@ -47,10 +44,10 @@ func GetConfig()*Config{
 	}
 	return DefaultConfig
 }
-func NewDb()(*gorm.DB, error){
-	if instanceDb==nil{
-		config:=GetConfig().Mysql.getConfig()
-		db, err := gorm.Open(gornmysql.Open(config),&gorm.Config{})
+func NewDb() (*gorm.DB, error) {
+	if instanceDb == nil {
+		config := GetConfig().getConfig()
+		db, err := gorm.Open(gornmysql.Open(config), &gorm.Config{})
 		// SetMaxIdleConns 设置空闲连接池中连接的最大数量
 		sqlDB, err := db.DB()
 		// SetMaxIdleConns 设置空闲连接池中连接的最大数量
@@ -64,13 +61,13 @@ func NewDb()(*gorm.DB, error){
 	}
 	return instanceDb, nil
 }
-func (config *Mysql)getConfig()string{
+func (config *Config) getConfig() string {
 	mysqlConfig := mysql.NewConfig()
-	mysqlConfig.User = config.User
-	mysqlConfig.DBName = config.Name
-	mysqlConfig.Passwd = config.Password
-	mysqlConfig.ParseTime=true
+	mysqlConfig.User = config.Mysql.User
+	mysqlConfig.DBName = config.Mysql.Name
+	mysqlConfig.Passwd = config.Mysql.Password
+	mysqlConfig.ParseTime = true
 	mysqlConfig.Net = "tcp"
-	mysqlConfig.Addr = config.Host + ":" + config.Port
+	mysqlConfig.Addr = config.Mysql.Host + ":" + config.Mysql.Port
 	return mysqlConfig.FormatDSN()
 }
